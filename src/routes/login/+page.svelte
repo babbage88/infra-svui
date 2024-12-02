@@ -54,7 +54,7 @@
         {#if error}
           <p class="text-red-500 text-sm mb-4">{error}</p>
         {/if}
-        <Button type="submit" class="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600">Login</Button>
+        <Button type="submit" class="w-full">Login</Button>
       </form>
     </div>
   </main>
