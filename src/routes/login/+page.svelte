@@ -7,6 +7,7 @@
     let username = '';
     let password = '';
     let error = '';
+    const apiLoginUrl = import.meta.env.VITE_API_URL + '/login'
 
     // @ts-ignore
     const handleSubmit = async (event) => {
@@ -14,7 +15,7 @@
       error = '';
 
       try {
-        const response = await fetch('http://10.0.0.32:8993/login', {
+        const response = await fetch(apiLoginUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
