@@ -1,17 +1,16 @@
-<script>
+<script lang="ts">
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
     import { Input } from "$lib/components/ui/input";
     import { Button } from '$lib/components/ui/button/';
+    import { Label } from "$lib/components/ui/label";
     import { login } from '$lib/services/auth';
 
     let username = '';
     let password = '';
     let error = '';
-    const apiLoginUrl = import.meta.env.VITE_API_URL + '/login'
 
-    // @ts-ignore
-    const handleSubmit = async (event) => {
+    const handleSubmit = async (event: Event) => {
     event.preventDefault();
     error = '';
 
@@ -29,11 +28,11 @@
       <h1 class="text-2xl font-bold text-center mb-6">Login</h1>
       <form on:submit={handleSubmit}>
         <div class="mb-4">
-          <label class="block text-gray-700 mb-2" for="username">Username:</label>
+          <Label class="block text-gray-700 mb-2" for="username">Username:</Label>
           <Input class="w-full border border-gray-300 rounded-lg p-2" id="username" type="username" bind:value={username} required />
         </div>
         <div class="mb-4">
-          <label class="block text-gray-700 mb-2" for="password">Password:</label>
+          <Label class="block text-gray-700 mb-2" for="password">Password:</Label>
           <Input class="w-full border border-gray-300 rounded-lg p-2" id="password" type="password" bind:value={password} required />
         </div>
         {#if error}
