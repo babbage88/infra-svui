@@ -14,7 +14,7 @@ const config = {
     adapter: adapter({ fallback: 'Index.html' })
   },
   alias: {
-    "@/*": "./src/lib/*",
+    "@/*": "./src/lib/*"
   }
 };
 

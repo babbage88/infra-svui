@@ -1,8 +1,9 @@
 <script>
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
-    import { Input } from "$lib/components/ui/input"
+    import { Input } from "$lib/components/ui/input";
     import { Button } from '$lib/components/ui/button/';
+    import { login } from '$lib/services/auth';
 
     let username = '';
     let password = '';
@@ -11,33 +12,16 @@
 
     // @ts-ignore
     const handleSubmit = async (event) => {
-      event.preventDefault();
-      error = '';
+    event.preventDefault();
+    error = '';
 
-      try {
-        const response = await fetch(apiLoginUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ username, password }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          // Store the token in localStorage or a cookie
-          localStorage.setItem('authToken', data.token);
-          // Redirect to another page
-          goto('/healthCheck');
-        } else {
-          const text = await response.text();
-          error = `Login failed: ${text}`;
-        }
-      } catch (err) {
-        console.error('Error logging in:', err);
-        error = 'An unexpected error occurred.';
-      }
-    };
+    const result = await login(username, password);
+    if (result) {
+      error = result;
+    } else {
+      goto('/healthCheck');
+    }
+  };
   </script>
 
 <main class="flex items-center justify-center min-h-screen">
