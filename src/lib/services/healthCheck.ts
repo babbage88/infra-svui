@@ -1,26 +1,13 @@
 import { writable } from 'svelte/store';
+import { fetchWithAuth } from './auth';
 
 export const BaseApiUrl = import.meta.env.VITE_API_URL;
 export const healthCheckAuthUrl = BaseApiUrl + '/authhealthCheck';
 export const status = writable<string | null>('Loading...');
 
-const token = localStorage.getItem('authToken');
-const refreshToken = localStorage.getItem('refreshToken');
-
 export async function fetchHealthStatus(): Promise<void> {
   try {
-    if (!token) {
-      status.set(null); // Set to null for no token
-      return;
-    }
-
-    const response = await fetch(healthCheckAuthUrl, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await fetchWithAuth(healthCheckAuthUrl, { method: 'GET' });
 
     if (response.ok) {
       const data = await response.json();
@@ -31,6 +18,6 @@ export async function fetchHealthStatus(): Promise<void> {
     }
   } catch (error) {
     console.error('Health check error:', error);
-    status.set('Failed to connect to the server.');
+    status.set(error instanceof Error ? error.message : 'Failed to connect to the server.');
   }
 }
