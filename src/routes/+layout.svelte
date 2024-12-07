@@ -7,9 +7,9 @@
 </script>
 
 <ModeWatcher />
-<ExamplesNav />
 <div class="flex flex-col min-h-screen">
-	<header class="flex justify-end items-center p-4">
+	<header class="flex justify-between items-center p-4">
+		<ExamplesNav />
 		<DarkModeToggle />
 	</header>
 	<main class="flex-1 p-4">

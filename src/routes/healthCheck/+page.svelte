@@ -3,6 +3,7 @@
     import { goto } from '$app/navigation';
     import { Button } from '$lib/components/ui/button';
     import { status, fetchHealthStatus } from '$lib/services/healthCheck';
+    import MainNav from '$lib/components/ui/mainnav/MainNav.svelte';
 
     onMount(() => {
     fetchHealthStatus();

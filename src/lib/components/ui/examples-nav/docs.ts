@@ -128,4 +128,8 @@ export const examples: Example[] = [
 		name: "Users",
 		href: "/users",
 	},
+	{
+		name: "Login",
+		href: "/login",
+	},
 ];
