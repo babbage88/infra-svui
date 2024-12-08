@@ -2,6 +2,7 @@
     import * as Table from "$lib/components/ui/table";
     import type { User } from "$lib/services/user";
     import { fetchUsers } from "$lib/services/user";
+    import UserDropDownMenu from "$lib/components/ui/userTableDropdownMenu/UserDropDownMenu.svelte";
 	import { onMount } from "svelte";
     let users: User[] = [];
     let error: string | null = null;
@@ -18,7 +19,7 @@
   </script>
 
 <Table.Root>
-    <Table.Caption>A list of your recent invoices.</Table.Caption>
+    <Table.Caption>Active go-infra users</Table.Caption>
     <Table.Header>
       <Table.Row>
         <Table.Head class="w-[100px]">ID</Table.Head>
