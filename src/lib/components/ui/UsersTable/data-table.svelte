@@ -9,7 +9,7 @@
 		addSortBy,
 		addTableFilter,
 	} from "svelte-headless-table/plugins";
-	import type { Task } from "../(data)/schemas.js";
+	import type { Task } from "./schemas.js";
 	import {
 		DataTableCheckbox,
 		DataTableColumnHeader,
@@ -21,7 +21,7 @@
 		DataTableToolbar,
 	} from "./index.js";
 
-	import * as Table from "$lib/registry/new-york/ui/table/index.js";
+	import * as Table from "$lib/components/ui/table";
 
 	export let data: Task[];
 

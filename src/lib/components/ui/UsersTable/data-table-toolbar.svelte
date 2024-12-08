@@ -2,11 +2,11 @@
 	import type { TableViewModel } from "svelte-headless-table";
 	import Cross2 from "svelte-radix/Cross2.svelte";
 	import type { Writable } from "svelte/store";
-	import { priorities, statuses } from "../(data)/data.js";
-	import type { Task } from "../(data)/schemas.js";
+	import { priorities, statuses } from "./data.js";
+	import type { Task } from "./schemas.js";
 	import { DataTableFacetedFilter, DataTableViewOptions } from "./index.js";
-	import Button from "$lib/registry/new-york/ui/button/button.svelte";
-	import { Input } from "$lib/registry/new-york/ui/input/index.js";
+	import Button from "$lib/components/ui/button/button.svelte";
+	import { Input } from "$lib/components/ui/input/index.js";
 
 	export let tableModel: TableViewModel<Task>;
 	export let data: Task[];

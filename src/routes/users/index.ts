@@ -2,6 +2,7 @@ export { default as DataTableCheckbox } from "$lib/components/ui/UsersTable/data
 export { default as DataTableTitleCell } from "$lib/components/ui/UsersTable/data-table-title-cell.svelte";
 export { default as DataTableStatusCell } from "$lib/components/ui/UsersTable/data-table-status-cell.svelte";
 export { default as DataTableRowActions } from "$lib/components/ui/UsersTable/data-table-row-actions.svelte";
+export { default as UserDropDownMenu } from "$lib/components/ui/userTableDropdownMenu/UserDropDownMenu.svelte";
 export { default as DataTablePriorityCell } from "$lib/components/ui/UsersTable/data-table-priority-cell.svelte";
 export { default as DataTableColumnHeader } from "$lib/components/ui/UsersTable/data-table-column-header.svelte";
 export { default as DataTableToolbar } from "$lib/components/ui/UsersTable/data-table-toolbar.svelte";
