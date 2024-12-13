@@ -4,11 +4,11 @@
 	import DoubleArrowRight from "svelte-radix/DoubleArrowRight.svelte";
 	import DoubleArrowLeft from "svelte-radix/DoubleArrowLeft.svelte";
 	import type { TableViewModel } from "svelte-headless-table";
-	import type { Task } from "./schemas.js";
+	import type { UserTableItem } from "./schemas.js";
 	import * as Select from "$lib/components/ui/select/index.js";
 	import { Button } from "$lib/components/ui/button/index.js";
 
-	export let tableModel: TableViewModel<Task>;
+	export let tableModel: TableViewModel<UserTableItem>;
 
 	const { pageRows, pluginStates, rows } = tableModel;
 

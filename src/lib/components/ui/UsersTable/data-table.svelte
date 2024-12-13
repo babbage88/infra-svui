@@ -1,5 +1,8 @@
 <script lang="ts">
-	import { get, readable } from "svelte/store";
+	import { get, readable, writable } from "svelte/store";
+	import { transformAndValidateUsers } from "./schemas.js";
+	import { onMount } from 'svelte';
+	import { fetchUsers } from '$lib/services/user.js';
 	import { Render, Subscribe, createRender, createTable } from "svelte-headless-table";
 	import {
 		addColumnFilters,
@@ -9,7 +12,8 @@
 		addSortBy,
 		addTableFilter,
 	} from "svelte-headless-table/plugins";
-	import type { Task } from "./schemas.js";
+	import type { UserTableItem } from "./schemas.js";
+	import type { User } from "$lib/services/user.js";
 	import {
 		DataTableCheckbox,
 		DataTableColumnHeader,
@@ -22,8 +26,10 @@
 	} from "./index.js";
 
 	import * as Table from "$lib/components/ui/table";
+	export let data: UserTableItem[];
 
-	export let data: Task[];
+	console.log('Data type in data-table:', Array.isArray(data), data); // Debug log
+
 
 	const table = createTable(readable(data), {
 		select: addSelectedRows(),
@@ -78,23 +84,19 @@
 			},
 		}),
 		table.column({
-			accessor: "title",
-			header: "Title",
-			id: "title",
-			cell: ({ value, row }) => {
-				if (row.isData()) {
-					return createRender(DataTableTitleCell, {
-						value,
-						labelValue: row.original.label,
-					});
-				}
-				return value;
+			accessor: "username",
+			header: "Username",
+			id: "username",
+			cell: ({ value }) => {
+				return createRender(DataTableStatusCell, {
+					value,
+				});
 			},
 		}),
 		table.column({
-			accessor: "status",
-			header: "Status",
-			id: "status",
+			accessor: "email",
+			header: "Email",
+			id: "email",
 			cell: ({ value }) => {
 				return createRender(DataTableStatusCell, {
 					value,
@@ -117,9 +119,9 @@
 			},
 		}),
 		table.column({
-			accessor: "priority",
-			id: "priority",
-			header: "Priority",
+			accessor: "role",
+			id: "role",
+			header: "Role",
 			cell: ({ value }) => {
 				return createRender(DataTablePriorityCell, {
 					value,
@@ -199,13 +201,13 @@
 			</Table.Header>
 			<Table.Body {...$tableBodyAttrs}>
 				{#if $pageRows.length}
-					{#each $pageRows as row (row.id)}
+					{#each $pageRows as row (row.id.toString())}
 						<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
 							<Table.Row {...rowAttrs}>
 								{#each row.cells as cell (cell.id)}
 									<Subscribe attrs={cell.attrs()} let:attrs>
 										<Table.Cell {...attrs}>
-											{#if cell.id === "task"}
+											{#if cell.id === "username"}
 												<div class="w-[80px]">
 													<Render of={cell.render()} />
 												</div>

@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: infraui
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: infraui
+  template:
+    metadata:
+      labels:
+        app: infraui
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname # Use the hostname label
+                    operator: In
+                    values:
+                      - trah-dev-01.trahan.dev
+      containers:
+        - name: infraui
+          image: docker.io/jtrahan88/infraui:v0.0.1-test
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+      imagePullSecrets:
+        - name: dockercred

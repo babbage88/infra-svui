@@ -1,12 +1,12 @@
 <script lang="ts">
 	import DotsHorizontal from "svelte-radix/DotsHorizontal.svelte";
 	import { labels } from "./data.js";
-	import { type Task, taskSchema } from "./schemas.js";
+	import { type UserTableItem, userSchema } from "./schemas.js";
 	import { Button } from "$lib/components/ui/button/index.js";
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
 
-	export let row: Task;
-	const task = taskSchema.parse(row);
+	export let row: UserTableItem;
+	const task = userSchema.parse(row);
 </script>
 
 <DropdownMenu.Root>

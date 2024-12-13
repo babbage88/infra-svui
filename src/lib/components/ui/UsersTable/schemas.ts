@@ -1,13 +1,23 @@
 import { z } from "zod";
+import type { User } from "$lib/services/user";
 
-// We're keeping a simple non-relational schema here.
-// IRL, you will have a schema for your data models.
-export const taskSchema = z.object({
-	id: z.string(),
-	title: z.string(),
-	status: z.string(),
-	label: z.string(),
-	priority: z.string(),
+export const userSchema = z.object({
+	id: z.number(),
+	username: z.string(),
+	email: z.string(),
+	role: z.string(),
+	createdAt: z.string(),
+	lastModified: z.string(),
+	enabled: z.boolean(),
+	isDeleted: z.boolean(),
 });
 
-export type Task = z.infer<typeof taskSchema>;
+export type UserTableItem = z.infer<typeof userSchema>;
+
+export async function transformAndValidateUsers(users: User[]): Promise<UserTableItem[]> {
+    return users.map(user => {
+      // Validate each user against the schema
+      const result = userSchema.parse(user);
+      return result;
+    });
+}

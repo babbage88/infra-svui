@@ -9,16 +9,16 @@ import Stopwatch from "svelte-radix/Stopwatch.svelte";
 
 export const labels = [
 	{
-		value: "bug",
-		label: "Bug",
+		value: "admin",
+		label: "Administrator",
 	},
 	{
-		value: "feature",
-		label: "Feature",
+		value: "postgres",
+		label: "Postgres",
 	},
 	{
-		value: "documentation",
-		label: "Documentation",
+		value: "sqlite",
+		label: "Sqlite",
 	},
 ];
 

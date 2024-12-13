@@ -3,28 +3,13 @@
 	import Cross2 from "svelte-radix/Cross2.svelte";
 	import type { Writable } from "svelte/store";
 	import { priorities, statuses } from "./data.js";
-	import type { Task } from "./schemas.js";
+	import type { UserTableItem } from "./schemas.js";
 	import { DataTableFacetedFilter, DataTableViewOptions } from "./index.js";
 	import Button from "$lib/components/ui/button/button.svelte";
 	import { Input } from "$lib/components/ui/input/index.js";
 
-	export let tableModel: TableViewModel<Task>;
-	export let data: Task[];
-
-	const counts = data.reduce<{
-		status: { [index: string]: number };
-		priority: { [index: string]: number };
-	}>(
-		(acc, { status, priority }) => {
-			acc.status[status] = (acc.status[status] || 0) + 1;
-			acc.priority[priority] = (acc.priority[priority] || 0) + 1;
-			return acc;
-		},
-		{
-			status: {},
-			priority: {},
-		}
-	);
+	export let tableModel: TableViewModel<UserTableItem>;
+	export let data: UserTableItem[];
 
 	const { pluginStates } = tableModel;
 	const {
@@ -54,18 +39,6 @@
 			bind:value={$filterValue}
 		/>
 
-		<DataTableFacetedFilter
-			bind:filterValues={$filterValues.status}
-			title="Status"
-			options={statuses}
-			counts={counts.status}
-		/>
-		<DataTableFacetedFilter
-			bind:filterValues={$filterValues.priority}
-			title="Priority"
-			options={priorities}
-			counts={counts.priority}
-		/>
 		{#if showReset}
 			<Button
 				on:click={() => {

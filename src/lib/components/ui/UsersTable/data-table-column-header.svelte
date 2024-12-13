@@ -4,7 +4,7 @@
 	import ArrowUp from "svelte-radix/ArrowUp.svelte";
 	import CaretSort from "svelte-radix/CaretSort.svelte";
 	import type { TableViewModel } from "svelte-headless-table";
-	import type { Task } from "./schemas.js";
+	import type { UserTableItem } from "./schemas.js";
 	import { cn } from "$lib/utils.js";
 	import { Button } from "$lib/components/ui/button/index.js";
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
@@ -21,7 +21,7 @@
 		};
 		filter: never;
 	};
-	export let tableModel: TableViewModel<Task>;
+	export let tableModel: TableViewModel<UserTableItem>;
 	export let cellId: string;
 
 	const { hiddenColumnIds } = tableModel.pluginStates.hide;
