@@ -1,1 +1,0 @@
-export { default as UserActionRightClick} from "./UserActionRightClick.svelte";

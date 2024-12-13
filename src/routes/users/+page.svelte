@@ -1,57 +1,23 @@
 <script lang="ts">
-  import * as Table from "$lib/components/ui/table/index.js";
-	import type { UserTableItem } from "$lib/components/ui/UsersTable/schemas";
-  import type { User } from "$lib/services/user";
-  import { transformAndValidateUsers } from "$lib/components/ui/UsersTable/schemas"
-	import { fetchUsers } from "$lib/services/user";
-	import { onMount } from "svelte";
-  import { Badge } from "$lib/components/ui/badge/index.js";
+    import { fetchUsers, type User } from "$lib/services/user";
+    import { onMount } from "svelte";
+    import { writable } from "svelte/store";  // Import writable store
+    import DataTable from "./data-table.svelte";
 
-  export let data: UserTableItem[] = [];
-  export let users: User[] = [];
+    let usersStore = writable<User[]>([]);
 
-  // Fetch users when the component is mounted
-  onMount(async () => {
-    try {
-      users = await fetchUsers();
-      console.log("Raw users data:", users); // Check if this is an array
-      if (Array.isArray(users)) {
-        data = await transformAndValidateUsers(users);
-        console.log("Validated data:", data); // Ensure this is an array
-      } else {
-        console.error("Expected an array of users but got:", users);
-        data = []; // Set data to an empty array if not valid
+    // Fetch users when the page component is mounted
+    onMount(async () => {
+      try {
+        const users = await fetchUsers();
+        usersStore.set(users);
+        console.log("Raw users data:", users);
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
       }
-    } catch (error) {
-      console.error("Failed to fetch users:", error);
-    }
-  });
+    });
+  </script>
 
-  console.log('Data type:', Array.isArray(data), data); // Verify data type here
-</script>
-
-<Table.Root>
-  <Table.Caption>Active goinfra users.</Table.Caption>
-  <Table.Header>
-    <Table.Row>
-      <Table.Head class="w-[100px]">Id</Table.Head>
-      <Table.Head>Username</Table.Head>
-      <Table.Head>Email</Table.Head>
-      <Table.Head>Role</Table.Head>
-      <Table.Head>CreatedAt</Table.Head>
-      <Table.Head class="text-right">Options</Table.Head>
-    </Table.Row>
-  </Table.Header>
-  <Table.Body>
-    {#each users as user, i (i)}
-      <Table.Row>
-        <Table.Cell class="font-medium">{user.id}</Table.Cell>
-        <Table.Cell>{user.username}</Table.Cell>
-        <Table.Cell>{user.email}</Table.Cell>
-        <Table.Cell><Badge>{user.role}</Badge></Table.Cell>
-        <Table.Cell>{user.createdAt}</Table.Cell>
-        <Table.Cell class="text-right font-bold">...</Table.Cell>
-      </Table.Row>
-    {/each}
-  </Table.Body>
-</Table.Root>
+  <div class="container mx-auto py-10">
+    <DataTable {usersStore} />
+  </div>
