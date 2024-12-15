@@ -6,6 +6,7 @@
     addPagination,
     addSortBy,
     addTableFilter,
+    addSelectedRows,
   } from "svelte-headless-table/plugins";
 	import ArrowUpDown from 'lucide-svelte/icons/arrow-up-down';
 	import DataTableActions from './data-table-actions.svelte';
@@ -13,6 +14,7 @@
 	import { UserRolesBadge } from '$lib/components/ui/badge-with-props/index.js';
 	import { Button } from '$lib/components/ui/button';
   import { Input } from "$lib/components/ui/input";
+  import DataTableCheckbox from "./data-table-checkbox.svelte";
 
 	export let usersStore: Writable<User[]>; // Accept the writable store as a prop
 
@@ -30,11 +32,25 @@
       fn: ({ filterValue, value }) =>
         value.toLowerCase().includes(filterValue.toLowerCase()),
     }),
+    select: addSelectedRows(),
 	});
 	const columns = table.createColumns([
 		table.column({
 			accessor: 'id',
-			header: 'ID',
+			header: (_, { pluginStates }) => {
+        const { allPageRowsSelected } = pluginStates.select;
+        return createRender(DataTableCheckbox, {
+          checked: allPageRowsSelected,
+        });
+      },
+      cell: ({ row }, { pluginStates }) => {
+        const { getRowState } = pluginStates.select;
+        const { isSelected } = getRowState(row);
+
+        return createRender(DataTableCheckbox, {
+          checked: isSelected,
+        });
+      },
 			plugins: {
 				sort: {
 					disable: false
@@ -100,11 +116,12 @@
 		})
 	]);
 
-	const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates } =
+	const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates, rows } =
 		table.createViewModel(columns);
 
 	const { hasNextPage, hasPreviousPage, pageIndex } = pluginStates.page;
   const { filterValue } = pluginStates.filter;
+  const { selectedDataIds } = pluginStates.select;
 </script>
 
 <div>
@@ -124,7 +141,7 @@
 						<Table.Row>
 							{#each headerRow.cells as cell (cell.id)}
 								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
-                  <Table.Head {...attrs}>
+                  <Table.Head {...attrs} class="[&:has([role=checkbox])]:pl-3">
                   {#if cell.id === "id"}
                   <Button variant="ghost" on:click={props.sort.toggle}>
                     <Render of={cell.render()} />
@@ -158,7 +175,10 @@
 			<Table.Body {...$tableBodyAttrs}>
 				{#each $pageRows as row (row.id)}
 					<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-						<Table.Row {...rowAttrs}>
+						<Table.Row
+              {...rowAttrs}
+              data-state={$selectedDataIds[row.id] && "selected"}
+            >
 							{#each row.cells as cell (cell.id)}
 								<Subscribe attrs={cell.attrs()} let:attrs>
 									<Table.Cell {...attrs}>
@@ -173,6 +193,10 @@
 		</Table.Root>
 	</div>
 	<div class="flex items-center justify-end space-x-4 py-4">
+    <div class="text-muted-foreground flex-1 text-sm">
+      {Object.keys($selectedDataIds).length} of{" "}
+      {$rows.length} row(s) selected.
+    </div>
 		<Button
 			variant="outline"
 			size="sm"
