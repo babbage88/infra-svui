@@ -18,7 +18,7 @@
     if (result) {
       error = result;
     } else {
-      goto('/healthCheck');
+      goto('/users');
     }
   };
   </script>
