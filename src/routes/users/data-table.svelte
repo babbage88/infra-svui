@@ -4,7 +4,8 @@
   import * as Table from "$lib/components/ui/table";
   import DataTableActions from "./data-table-actions.svelte";
   import { onDestroy } from "svelte";
-import type { User } from "$lib/services/user";
+  import type { User } from "$lib/services/user";
+  import { UserRolesBadge } from "$lib/components/ui/badge-with-props/index.js";
 
   export let usersStore: Writable<User[]>;  // Accept the writable store as a prop
 
@@ -33,6 +34,9 @@ import type { User } from "$lib/services/user";
     table.column({
       accessor: "role",
       header: "Role",
+      cell: ({ value }) => {
+        return createRender(UserRolesBadge, { value: value });
+      },
     }),
     table.column({
       accessor: ({ id }) => id,
