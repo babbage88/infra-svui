@@ -2,12 +2,17 @@
 	import { writable, type Writable } from 'svelte/store'; // Import writable store
 	import { createTable, Render, Subscribe, createRender } from 'svelte-headless-table';
 	import * as Table from '$lib/components/ui/table';
-	import { addPagination, addSortBy } from 'svelte-headless-table/plugins';
+  import {
+    addPagination,
+    addSortBy,
+    addTableFilter,
+  } from "svelte-headless-table/plugins";
 	import ArrowUpDown from 'lucide-svelte/icons/arrow-up-down';
 	import DataTableActions from './data-table-actions.svelte';
 	import type { User } from '$lib/services/user';
 	import { UserRolesBadge } from '$lib/components/ui/badge-with-props/index.js';
 	import { Button } from '$lib/components/ui/button';
+  import { Input } from "$lib/components/ui/input";
 
 	export let usersStore: Writable<User[]>; // Accept the writable store as a prop
 
@@ -20,7 +25,11 @@
 	// Create the table based on the users data
 	const table = createTable(users, {
 		page: addPagination(),
-		sort: addSortBy()
+		sort: addSortBy(),
+    filter: addTableFilter({
+      fn: ({ filterValue, value }) =>
+        value.toLowerCase().includes(filterValue.toLowerCase()),
+    }),
 	});
 	const columns = table.createColumns([
 		table.column({
@@ -29,7 +38,10 @@
 			plugins: {
 				sort: {
 					disable: false
-				}
+				},
+        filter: {
+          exclude: true,
+        }
 			}
 		}),
 		table.column({
@@ -38,7 +50,10 @@
 			plugins: {
 				sort: {
 					disable: false
-				}
+				},
+        filter: {
+          exclude: false,
+        }
 			}
 		}),
 		table.column({
@@ -47,7 +62,10 @@
 			plugins: {
 				sort: {
 					disable: false
-				}
+				},
+        filter: {
+          exclude: false,
+        }
 			}
 		}),
 		table.column({
@@ -59,7 +77,10 @@
 			plugins: {
 				sort: {
 					disable: false
-				}
+				},
+        filter: {
+          exclude: true,
+        }
 			}
 		}),
 		table.column({
@@ -71,7 +92,10 @@
 			plugins: {
 				sort: {
 					disable: true
-				}
+				},
+        filter: {
+          exclude: true,
+        }
 			}
 		})
 	]);
@@ -80,9 +104,18 @@
 		table.createViewModel(columns);
 
 	const { hasNextPage, hasPreviousPage, pageIndex } = pluginStates.page;
+  const { filterValue } = pluginStates.filter;
 </script>
 
 <div>
+  <div class="flex items-center py-4">
+    <Input
+      class="max-w-sm"
+      placeholder="Filter username, emails..."
+      type="text"
+      bind:value={$filterValue}
+    />
+  </div>
 	<div class="rounded-md border">
 		<Table.Root {...$tableAttrs}>
 			<Table.Header>
