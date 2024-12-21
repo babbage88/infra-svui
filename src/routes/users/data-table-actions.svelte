@@ -21,12 +21,16 @@
     <DropdownMenu.Content>
      <DropdownMenu.Group>
       <DropdownMenu.Label>Actions</DropdownMenu.Label>
-      <DropdownMenu.Item on:click={() => navigator.clipboard.writeText(id.toString())}>
-       Reset Password
-      </DropdownMenu.Item>
+        <DropdownMenu.Item on:click={() => navigator.clipboard.writeText(id.toString())}>
+         Reset Password
+        </DropdownMenu.Item>
      </DropdownMenu.Group>
      <DropdownMenu.Separator />
-     <DropdownMenu.Item>Enable/Disable</DropdownMenu.Item>
-     <DropdownMenu.Item>Modify Roles</DropdownMenu.Item>
+        <DropdownMenu.Item on:click={() => navigator.clipboard.writeText(id.toString())} >
+        Enable/Disable
+        </DropdownMenu.Item>
+        <DropdownMenu.Item on:click={() => navigator.clipboard.writeText(id.toString())}>
+        Modify Roles
+        </DropdownMenu.Item>
     </DropdownMenu.Content>
    </DropdownMenu.Root>
