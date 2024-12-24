@@ -12,6 +12,7 @@
 	import DataTableActions from './data-table-actions.svelte';
 	import type { User } from '$lib/services/user';
 	import { UserRolesBadge } from '$lib/components/ui/badge-with-props/index.js';
+	import { RolesBadges } from './index.js';
 	import { Button } from '$lib/components/ui/button';
   import { Input } from "$lib/components/ui/input";
   import DataTableCheckbox from "./data-table-checkbox.svelte";
@@ -85,10 +86,10 @@
 			}
 		}),
 		table.column({
-			accessor: 'role',
-			header: 'Role',
+			accessor: 'roles',
+			header: 'Roles',
 			cell: ({ value }) => {
-				return createRender(UserRolesBadge, { value: value });
+				return createRender(RolesBadges, { roles: value });
 			},
 			plugins: {
 				sort: {

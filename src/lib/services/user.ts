@@ -6,6 +6,7 @@ const BaseApiUrl = import.meta.env.VITE_API_URL;
 const usersUrl = `${BaseApiUrl}/users`;
 const createUserUrl = `${BaseApiUrl}/create/user`;
 const userPasswordUrl = `${BaseApiUrl}/update/userpass`;
+const softDeleteUserUrl = `${BaseApiUrl}/user/delete`;
 const enableUserUrl = `${BaseApiUrl}/user/enable`;
 const disableUserUrl = `${BaseApiUrl}/user/disable`;
 const updateUserRoleUrl = `${BaseApiUrl}/user/role`;
@@ -18,7 +19,7 @@ export interface User {
   id: number;
   username: string;
   email: string;
-  role: string;
+  roles: string[];
   createdAt: string;
   lastModified: string;
   enabled: boolean;
@@ -85,10 +86,23 @@ export async function disableUser(targetUserId: number): Promise<ApiResponse<Use
   }
 }
 
-// Update user role
-export async function updateUserRole(executionUserId: number, targetUserId: number, roleId: number): Promise<ApiResponse<void>> {
+// Delete user
+export async function deleteUserById(targetUserId: number): Promise<ApiResponse<User>> {
   try {
-    const body = { executionUserId, targetUserId, roleId };
+    const body = { targetUserId };
+    const response = await fetchWithAuth(softDeleteUserUrl, { method: 'POST', body: JSON.stringify(body) });
+    if (!response.ok) throw new Error(await response.text());
+    return await response.json();
+  } catch (error) {
+    console.error('Error enabling user:', error);
+    return { success: false, error: String(error) };
+  }
+}
+
+// Update user role
+export async function updateUserRole(targetUserId: number, roleId: number): Promise<ApiResponse<void>> {
+  try {
+    const body = { targetUserId, roleId };
     const response = await fetchWithAuth(updateUserRoleUrl, { method: 'POST', body: JSON.stringify(body) });
     if (!response.ok) throw new Error(await response.text());
     return { success: true };
@@ -131,6 +145,18 @@ export async function fetchPermissions(): Promise<ApiResponse<AppPermission>> {
     return { success: true, data: await response.json() };
   } catch (error) {
     console.error('Error fetching permissions:', error);
+    return { success: false, error: String(error) };
+  }
+}
+
+export async function updateUserPassword(targetUserId: number, newPassword: string): Promise<ApiResponse<void>> {
+  try {
+    const body = { targetUserId, newPassword };
+    const response = await fetchWithAuth(userPasswordUrl, { method: 'POST', body: JSON.stringify(body) });
+    if (!response.ok) throw new Error(await response.text());
+    return { success: true };
+  } catch (error) {
+    console.error('Error creating user role:', error);
     return { success: false, error: String(error) };
   }
 }

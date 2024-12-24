@@ -45,5 +45,10 @@
     "@tailwindcss/typography": "^0.5.15",
     "svelte-headless-table": "^0.18.3",
     "svelte-radix": "^2.0.1"
+  },
+  "overrides": {
+    "svelte-headless-table": {
+      "svelte": "^5.0.0"
+    }
   }
 }

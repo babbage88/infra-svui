@@ -2,6 +2,7 @@
     import Ellipsis from "lucide-svelte/icons/ellipsis";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
     import { Button } from "$lib/components/ui/button";
+    import { updateUserPassword, enableUser, disableUser, deleteUserById, updateUserRole } from "$lib/services/user"
 
     export let id: number;
    </script>
@@ -21,9 +22,12 @@
     <DropdownMenu.Content>
      <DropdownMenu.Group>
       <DropdownMenu.Label>Actions</DropdownMenu.Label>
-        <DropdownMenu.Item on:click={() => navigator.clipboard.writeText(id.toString())}>
+        <DropdownMenu.Item on:click={() => updateUserPassword(id, "newPassword")}>
          Reset Password
         </DropdownMenu.Item>
+        <DropdownMenu.Item on:click={() => deleteUserById(id)}>
+          Delete User
+         </DropdownMenu.Item>
      </DropdownMenu.Group>
      <DropdownMenu.Separator />
         <DropdownMenu.Item on:click={() => navigator.clipboard.writeText(id.toString())} >
