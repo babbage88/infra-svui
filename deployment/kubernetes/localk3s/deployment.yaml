@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: infraui
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: infraui
@@ -16,23 +16,23 @@ spec:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
-              - matchExpressions:
-                  - key: kubernetes.io/hostname # Use the hostname label
-                    operator: In
-                    values:
-                      - trah-dev-01.trahan.dev
+            - matchExpressions:
+              - key: kubernetes.io/hostname # Use the hostname label
+                operator: In
+                values:
+                - trah-dev-01.trahan.dev
       containers:
-        - name: infraui
-          image: docker.io/jtrahan88/infraui:v0.0.1-test
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 3000
-          resources:
-            limits:
-              memory: "256Mi"
-              cpu: "500m"
-            requests:
-              memory: "256Mi"
-              cpu: "250m"
+      - name: infraui
+        image: docker.io/jtrahan88/infraui:v0.0.1-test
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
       imagePullSecrets:
-        - name: dockercred
+      - name: dockercred
