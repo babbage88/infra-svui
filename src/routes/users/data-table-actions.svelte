@@ -1,16 +1,26 @@
 <script lang="ts">
     import Ellipsis from "lucide-svelte/icons/ellipsis";
+    import { PasswordResetModal } from "./index.js";
     import Label from "$lib/components/ui/label/label.svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
     import Input from "$lib/components/ui/input/input.svelte";
     import { Button } from "$lib/components/ui/button";
     import { updateUserPassword, enableUser, disableUser, deleteUserById, updateUserRole } from "$lib/services/user"
-	import { get, writable } from "svelte/store";
+	  import { get, writable } from "svelte/store";
 
     export let id: number;
 
-    const newPassword = writable("");
+  const newPassword = writable("");
   const showResetModal = writable(false);
+  let showPasswordModal = false;
+
+  const handlePasswordResetTest = async (event: CustomEvent<{ newPassword: string }>) => {
+  const { newPassword } = event.detail;
+  await updateUserPassword(id, newPassword);
+  showPasswordModal = false;
+  alert('Password updated successfully!');
+};
+
 
   const handlePasswordReset = async () => {
     const password = get(newPassword);
@@ -45,7 +55,7 @@
     <DropdownMenu.Content>
      <DropdownMenu.Group>
       <DropdownMenu.Label>Actions</DropdownMenu.Label>
-      <DropdownMenu.Item on:click={() => showResetModal.set(true)}>
+      <DropdownMenu.Item on:click={() => (showPasswordModal = true)}>
          Reset Password
         </DropdownMenu.Item>
         <DropdownMenu.Item on:click={() => deleteUserById(id)}>
@@ -62,26 +72,9 @@
     </DropdownMenu.Content>
    </DropdownMenu.Root>
 
-   {#if $showResetModal}
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="w-1/3 rounded-lg p-6 shadow-lg">
-      <h3 class="text-lg font-semibold mb-4">Reset Password</h3>
-      <div>
-        <Label class="block mb-2 text-sm font-medium text-gray-700">New Password</Label>
-        <Input
-          type="password"
-          class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          bind:value={$newPassword}
-        />
-      </div>
-      <div class="mt-4 flex justify-end space-x-2">
-        <Button variant="secondary" on:click={() => showResetModal.set(false)}>
-          Cancel
-        </Button>
-        <Button on:click={handlePasswordReset}>
-          Reset
-        </Button>
-      </div>
-    </div>
-  </div>
-{/if}
+
+   <PasswordResetModal
+   show={showPasswordModal}
+   on:reset={handlePasswordResetTest}
+   on:close={() => (showPasswordModal = false)}
+ />
