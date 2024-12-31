@@ -9,7 +9,7 @@
     addSelectedRows,
   } from "svelte-headless-table/plugins";
 	import ArrowUpDown from 'lucide-svelte/icons/arrow-up-down';
-	import DataTableActions from './data-table-actions.svelte';
+	import { DataTableActions } from './index.js';
 	import type { User } from '$lib/services/user';
 	import { UserRolesBadge } from '$lib/components/ui/badge-with-props/index.js';
 	import { RolesBadges } from './index.js';

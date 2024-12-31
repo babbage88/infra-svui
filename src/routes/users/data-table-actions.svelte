@@ -4,40 +4,25 @@
     import Label from "$lib/components/ui/label/label.svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
     import Input from "$lib/components/ui/input/input.svelte";
+    import { Toaster } from "$lib/components/ui/sonner";
     import { Button } from "$lib/components/ui/button";
     import { updateUserPassword, enableUser, disableUser, deleteUserById, updateUserRole } from "$lib/services/user"
 	  import { get, writable } from "svelte/store";
+	import { toast } from "svelte-sonner";
 
     export let id: number;
+ 
+    const newPassword = writable("");
+    const showResetModal = writable(false);
+    let showPasswordModal = false;
 
-  const newPassword = writable("");
-  const showResetModal = writable(false);
-  let showPasswordModal = false;
-
-  const handlePasswordResetTest = async (event: CustomEvent<{ newPassword: string }>) => {
-  const { newPassword } = event.detail;
-  await updateUserPassword(id, newPassword);
-  showPasswordModal = false;
-  alert('Password updated successfully!');
-};
-
-
-  const handlePasswordReset = async () => {
-    const password = get(newPassword);
-    if (password) {
-      try {
-        await updateUserPassword(id, password);
-        alert("Password reset successfully!");
-      } catch (error) {
-        console.error("Error resetting password:", error);
-        alert("Failed to reset password.");
-      }
-    } else {
-      alert("Password cannot be empty!");
-    }
-    showResetModal.set(false);
-    newPassword.set("");
-  };
+    const handlePasswordReset = async (event: CustomEvent<{ newPassword: string }>) => {
+      const { newPassword } = event.detail;
+      await updateUserPassword(id, newPassword);
+      showPasswordModal = false;
+      const msg: string = 'Password updated successfully for user id ' + id.toString() + '.';
+      toast(msg);
+    };
    </script>
 
    <DropdownMenu.Root>
@@ -72,9 +57,12 @@
     </DropdownMenu.Content>
    </DropdownMenu.Root>
 
-
    <PasswordResetModal
    show={showPasswordModal}
-   on:reset={handlePasswordResetTest}
+   id={id}
+   on:reset={handlePasswordReset}
    on:close={() => (showPasswordModal = false)}
  />
+<Toaster />
+
+ 

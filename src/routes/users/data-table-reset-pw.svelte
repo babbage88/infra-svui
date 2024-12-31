@@ -9,6 +9,7 @@
     import { createEventDispatcher } from 'svelte';
     const dispatch = createEventDispatcher();
     export let show: boolean = false;
+    export let id: number;
 
     let newPassword = '';
 
@@ -28,7 +29,7 @@
    <Card.Root class="w-[350px]">
     <Card.Header>
      <Card.Title>Reset Password</Card.Title>
-     <Card.Description>Enter new password for user.</Card.Description>
+     <Card.Description>Enter new password for user id {id}.</Card.Description>
     </Card.Header>
     <Card.Content>
      <form>
