@@ -22,7 +22,7 @@
 	// Create a derived store for reactivity (we subscribe to the passed store)
 	const users = writable<User[]>([]);
 	usersStore.subscribe(($usersStore) => {
-		users.set($usersStore); // Update the local `users` store when `usersStore` changes
+		users.set($usersStore);
 	});
 
 	// Create the table based on the users data
