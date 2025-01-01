@@ -28,18 +28,21 @@
 
     
     const resetEnableDisableEvent = async () => {
+      let msg = '';
       if (execAction.EnableUser === true) {
         const user = await enableUser(id);
-        const enableDisableMsg = user.data?.username + " has been enabled."
+        const msg = user.data?.username + " has been enabled."
         console.log("User enabled:", user);
         show = false;
-        dispatch("reset", enableDisableMsg)
+        console.log('reset', enableDisableMsg)
+        dispatch("reset", { enableDisableMsg: msg }); 
       } else if (execAction.DisableUser === true) {
           const user = await disableUser(id);
-          const enableDisableMsg = user.data?.username + " has been disabled."
+          const msg = user.data?.username + " has been disabled."
           console.log("User enabled:", user);
           show = false;
-          dispatch("reset", enableDisableMsg)
+          console.log('reset', enableDisableMsg)
+          dispatch("reset", { enableDisableMsg: msg }); 
       }
   };
 
