@@ -1,6 +1,7 @@
 <script lang="ts">
     import Ellipsis from "lucide-svelte/icons/ellipsis";
     import { PasswordResetModal } from "./index.js";
+    import { EnableDisableUserModal } from "./index.js";
     import Label from "$lib/components/ui/label/label.svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
     import Input from "$lib/components/ui/input/input.svelte";
@@ -15,6 +16,7 @@
     const newPassword = writable("");
     const showResetModal = writable(false);
     let showPasswordModal = false;
+    let showEnableDisableModal = false;
 
     const handlePasswordReset = async (event: CustomEvent<{ newPassword: string }>) => {
       const { newPassword } = event.detail;
@@ -23,6 +25,27 @@
       const msg: string = 'Password updated successfully for user id ' + id.toString() + '.';
       toast(msg);
     };
+
+    const handleEnableDisableUser = async (
+      event: CustomEvent<{ execEnableUser: boolean; execDisableUser: boolean }>
+    ) => {
+      const { execEnableUser, execDisableUser } = event.detail;
+
+      if (execEnableUser) {
+        const user = await enableUser(id);
+        console.log("User enabled:", user);
+        showEnableDisableModal = false;
+        const msg = user.data?.username + " has been enabled."
+        toast(msg)
+      } else if (execDisableUser) {
+        const user = await disableUser(id);
+        console.log("User disabled:", user);
+        showEnableDisableModal = false;
+        const msg = user.data?.username + " has been disabled."
+        toast(msg)
+      }
+    };
+
    </script>
 
    <DropdownMenu.Root>
@@ -48,7 +71,7 @@
          </DropdownMenu.Item>
      </DropdownMenu.Group>
      <DropdownMenu.Separator />
-        <DropdownMenu.Item on:click={() => navigator.clipboard.writeText(id.toString())} >
+        <DropdownMenu.Item on:click={() => (showEnableDisableModal = true)} >
         Enable/Disable
         </DropdownMenu.Item>
         <DropdownMenu.Item on:click={() => navigator.clipboard.writeText(id.toString())}>
@@ -62,6 +85,14 @@
    id={id}
    on:reset={handlePasswordReset}
    on:close={() => (showPasswordModal = false)}
+ />
+
+ <EnableDisableUserModal 
+  show={showEnableDisableModal}
+  id={id}
+  on:reset={handleEnableDisableUser}
+  on:close={() => (showEnableDisableModal = false)}
+  
  />
 <Toaster />
 
