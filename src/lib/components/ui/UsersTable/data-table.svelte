@@ -1,197 +1,171 @@
 <script lang="ts">
-	import { get, readable, writable } from "svelte/store";
-	import { transformAndValidateUsers } from "./schemas.js";
-	import { onMount } from 'svelte';
-	import { fetchUsers } from '$lib/services/user.js';
-	import { Render, Subscribe, createRender, createTable } from "svelte-headless-table";
-	import {
-		addColumnFilters,
-		addHiddenColumns,
-		addPagination,
-		addSelectedRows,
-		addSortBy,
-		addTableFilter,
-	} from "svelte-headless-table/plugins";
-	import type { UserTableItem } from "./schemas.js";
-	import type { User } from "$lib/services/user.js";
-	import {
-		DataTableCheckbox,
-		DataTableColumnHeader,
-		DataTablePagination,
-		DataTablePriorityCell,
-		DataTableRowActions,
-		DataTableStatusCell,
-		DataTableTitleCell,
-		DataTableToolbar,
-	} from "./index.js";
+	import { writable, type Writable } from 'svelte/store'; // Import writable store
+	import { createTable, Render, Subscribe, createRender } from 'svelte-headless-table';
+	import * as Table from '$lib/components/ui/table';
+  import {
+    addPagination,
+    addSortBy,
+    addTableFilter,
+    addSelectedRows,
+  } from "svelte-headless-table/plugins";
+	import ArrowUpDown from 'lucide-svelte/icons/arrow-up-down';
+	import { DataTableActions } from './index.js';
+	import type { User } from '$lib/services/user';
+	import { UserRolesBadge } from '$lib/components/ui/badge-with-props/index.js';
+	import { RolesBadges } from './index.js';
+	import { Button } from '$lib/components/ui/button';
+  import { Input } from "$lib/components/ui/input";
+  import DataTableCheckbox from "./data-table-checkbox.svelte";
 
-	import * as Table from "$lib/components/ui/table";
-	export let data: UserTableItem[];
+	export let usersStore: Writable<User[]>; // Accept the writable store as a prop
 
-	console.log('Data type in data-table:', Array.isArray(data), data); // Debug log
-
-
-	const table = createTable(readable(data), {
-		select: addSelectedRows(),
-		sort: addSortBy({
-			toggleOrder: ["asc", "desc"],
-		}),
-		page: addPagination(),
-		filter: addTableFilter({
-			fn: ({ filterValue, value }) => {
-				return value.toLowerCase().includes(filterValue.toLowerCase());
-			},
-		}),
-		colFilter: addColumnFilters(),
-		hide: addHiddenColumns(),
+	// Create a derived store for reactivity (we subscribe to the passed store)
+	const users = writable<User[]>([]);
+	usersStore.subscribe(($usersStore) => {
+		users.set($usersStore);
 	});
 
+	// Create the table based on the users data
+	const table = createTable(users, {
+		page: addPagination(),
+		sort: addSortBy(),
+    filter: addTableFilter({
+      fn: ({ filterValue, value }) =>
+        value.toLowerCase().includes(filterValue.toLowerCase()),
+    }),
+    select: addSelectedRows(),
+	});
 	const columns = table.createColumns([
-		table.display({
-			id: "select",
+		table.column({
+			accessor: 'id',
 			header: (_, { pluginStates }) => {
-				const { allPageRowsSelected } = pluginStates.select;
-				return createRender(DataTableCheckbox, {
-					checked: allPageRowsSelected,
-					"aria-label": "Select all",
-				});
-			},
-			cell: ({ row }, { pluginStates }) => {
-				const { getRowState } = pluginStates.select;
-				const { isSelected } = getRowState(row);
-				return createRender(DataTableCheckbox, {
-					checked: isSelected,
-					"aria-label": "Select row",
-					class: "translate-y-[2px]",
-				});
-			},
-			plugins: {
-				sort: {
-					disable: true,
-				},
-			},
-		}),
-		table.column({
-			accessor: "id",
-			header: () => {
-				return "Task";
-			},
-			id: "task",
-			plugins: {
-				sort: {
-					disable: true,
-				},
-			},
-		}),
-		table.column({
-			accessor: "username",
-			header: "Username",
-			id: "username",
-			cell: ({ value }) => {
-				return createRender(DataTableStatusCell, {
-					value,
-				});
-			},
-		}),
-		table.column({
-			accessor: "email",
-			header: "Email",
-			id: "email",
-			cell: ({ value }) => {
-				return createRender(DataTableStatusCell, {
-					value,
-				});
-			},
-			plugins: {
-				colFilter: {
-					fn: ({ filterValue, value }) => {
-						if (filterValue.length === 0) return true;
-						if (!Array.isArray(filterValue) || typeof value !== "string") return true;
-						return filterValue.some((filter) => {
-							return value.includes(filter);
-						});
-					},
-					initialFilterValue: [],
-					render: ({ filterValue }) => {
-						return get(filterValue);
-					},
-				},
-			},
-		}),
-		table.column({
-			accessor: "role",
-			id: "role",
-			header: "Role",
-			cell: ({ value }) => {
-				return createRender(DataTablePriorityCell, {
-					value,
-				});
-			},
-			plugins: {
-				colFilter: {
-					fn: ({ filterValue, value }) => {
-						if (filterValue.length === 0) return true;
-						if (!Array.isArray(filterValue) || typeof value !== "string") return true;
+        const { allPageRowsSelected } = pluginStates.select;
+        return createRender(DataTableCheckbox, {
+          checked: allPageRowsSelected,
+        });
+      },
+      cell: ({ row }, { pluginStates }) => {
+        const { getRowState } = pluginStates.select;
+        const { isSelected } = getRowState(row);
 
-						return filterValue.some((filter) => {
-							return value.includes(filter);
-						});
-					},
-					initialFilterValue: [],
-					render: ({ filterValue }) => {
-						return get(filterValue);
-					},
+        return createRender(DataTableCheckbox, {
+          checked: isSelected,
+        });
+      },
+			plugins: {
+				sort: {
+					disable: false
 				},
-			},
+        filter: {
+          exclude: true,
+        }
+			}
 		}),
-		table.display({
-			id: "actions",
-			header: () => {
-				return "";
-			},
-			cell: ({ row }) => {
-				if (row.isData() && row.original) {
-					return createRender(DataTableRowActions, {
-						row: row.original,
-					});
-				}
-				return "";
-			},
+		table.column({
+			accessor: 'username',
+			header: 'Username',
+			plugins: {
+				sort: {
+					disable: false
+				},
+        filter: {
+          exclude: false,
+        }
+			}
 		}),
+		table.column({
+			accessor: 'email',
+			header: 'Email',
+			plugins: {
+				sort: {
+					disable: false
+				},
+        filter: {
+          exclude: false,
+        }
+			}
+		}),
+		table.column({
+			accessor: 'roles',
+			header: 'Roles',
+			cell: ({ value }) => {
+				return createRender(RolesBadges, { roles: value });
+			},
+			plugins: {
+				sort: {
+					disable: false
+				},
+        filter: {
+          exclude: true,
+        }
+			}
+		}),
+		table.column({
+			accessor: ({ id }) => id,
+			header: '',
+			cell: ({ value }) => {
+				return createRender(DataTableActions, { id: value });
+			},
+			plugins: {
+				sort: {
+					disable: true
+				},
+        filter: {
+          exclude: true,
+        }
+			}
+		})
 	]);
 
-	const tableModel = table.createViewModel(columns);
+	const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates, rows } =
+		table.createViewModel(columns);
 
-	const { headerRows, pageRows, tableAttrs, tableBodyAttrs } = tableModel;
+	const { hasNextPage, hasPreviousPage, pageIndex } = pluginStates.page;
+  const { filterValue } = pluginStates.filter;
+  const { selectedDataIds } = pluginStates.select;
 </script>
 
-<div class="space-y-4">
-	<DataTableToolbar {tableModel} {data} />
+<div>
+  <div class="flex items-center py-4">
+    <Input
+      class="max-w-sm"
+      placeholder="Filter username, emails..."
+      type="text"
+      bind:value={$filterValue}
+    />
+  </div>
 	<div class="rounded-md border">
 		<Table.Root {...$tableAttrs}>
 			<Table.Header>
-				{#each $headerRows as headerRow}
+				{#each $headerRows as headerRow (headerRow.id)}
 					<Subscribe rowAttrs={headerRow.attrs()}>
 						<Table.Row>
 							{#each headerRow.cells as cell (cell.id)}
-								<Subscribe
-									attrs={cell.attrs()}
-									let:attrs
-									props={cell.props()}
-									let:props
-								>
-									<Table.Head {...attrs}>
-										{#if cell.id !== "select" && cell.id !== "actions"}
-											<DataTableColumnHeader
-												{props}
-												{tableModel}
-												cellId={cell.id}
-											>
-												<Render of={cell.render()} /></DataTableColumnHeader
-											>
-										{:else}
-											<Render of={cell.render()} />
-										{/if}
+								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
+                  <Table.Head {...attrs} class="[&:has([role=checkbox])]:pl-3">
+                  {#if cell.id === "id"}
+                  <Button variant="ghost" on:click={props.sort.toggle}>
+                    <Render of={cell.render()} />
+                    <ArrowUpDown class={"ml-2 h-4 w-4"} />
+                  </Button>
+                  {:else if cell.id === "username"}
+                  <Button variant="ghost" on:click={props.sort.toggle}>
+                    <Render of={cell.render()} />
+                    <ArrowUpDown class={"ml-2 h-4 w-4"} />
+                  </Button>
+                  {:else if cell.id ==="email"}
+                  <Button variant="ghost" on:click={props.sort.toggle}>
+                    <Render of={cell.render()} />
+                    <ArrowUpDown class={"ml-2 h-4 w-4"} />
+                  </Button>
+                  {:else if cell.id === "role"}
+                  <Button variant="ghost" on:click={props.sort.toggle}>
+                    <Render of={cell.render()} />
+                    <ArrowUpDown class={"ml-2 h-4 w-4"} />
+                  </Button>
+                  {:else}
+										<Render of={cell.render()} />
+                  {/if}
 									</Table.Head>
 								</Subscribe>
 							{/each}
@@ -200,35 +174,41 @@
 				{/each}
 			</Table.Header>
 			<Table.Body {...$tableBodyAttrs}>
-				{#if $pageRows.length}
-					{#each $pageRows as row (row.id.toString())}
-						<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-							<Table.Row {...rowAttrs}>
-								{#each row.cells as cell (cell.id)}
-									<Subscribe attrs={cell.attrs()} let:attrs>
-										<Table.Cell {...attrs}>
-											{#if cell.id === "username"}
-												<div class="w-[80px]">
-													<Render of={cell.render()} />
-												</div>
-											{:else}
-												<Render of={cell.render()} />
-											{/if}
-										</Table.Cell>
-									</Subscribe>
-								{/each}
-							</Table.Row>
-						</Subscribe>
-					{/each}
-				{:else}
-					<Table.Row>
-						<Table.Cell colspan={columns.length} class="h-24 text-center">
-							No results.
-						</Table.Cell>
-					</Table.Row>
-				{/if}
+				{#each $pageRows as row (row.id)}
+					<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
+						<Table.Row
+              {...rowAttrs}
+              data-state={$selectedDataIds[row.id] && "selected"}
+            >
+							{#each row.cells as cell (cell.id)}
+								<Subscribe attrs={cell.attrs()} let:attrs>
+									<Table.Cell {...attrs}>
+										<Render of={cell.render()} />
+									</Table.Cell>
+								</Subscribe>
+							{/each}
+						</Table.Row>
+					</Subscribe>
+				{/each}
 			</Table.Body>
 		</Table.Root>
 	</div>
-	<DataTablePagination {tableModel} />
+	<div class="flex items-center justify-end space-x-4 py-4">
+    <div class="text-muted-foreground flex-1 text-sm">
+      {Object.keys($selectedDataIds).length} of{" "}
+      {$rows.length} row(s) selected.
+    </div>
+		<Button
+			variant="outline"
+			size="sm"
+			on:click={() => ($pageIndex = $pageIndex - 1)}
+			disabled={!$hasPreviousPage}>Previous</Button
+		>
+		<Button
+			variant="outline"
+			size="sm"
+			disabled={!$hasNextPage}
+			on:click={() => ($pageIndex = $pageIndex + 1)}>Next</Button
+		>
+	</div>
 </div>

@@ -1,46 +1,68 @@
 <script lang="ts">
-	import DotsHorizontal from "svelte-radix/DotsHorizontal.svelte";
-	import { labels } from "./data.js";
-	import { type UserTableItem, userSchema } from "./schemas.js";
-	import { Button } from "$lib/components/ui/button/index.js";
-	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
+    import Ellipsis from "lucide-svelte/icons/ellipsis";
+    import { PasswordResetModal } from "./index.js";
+    import Label from "$lib/components/ui/label/label.svelte";
+    import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
+    import Input from "$lib/components/ui/input/input.svelte";
+    import { Toaster } from "$lib/components/ui/sonner";
+    import { Button } from "$lib/components/ui/button";
+    import { updateUserPassword, enableUser, disableUser, deleteUserById, updateUserRole } from "$lib/services/user"
+	  import { get, writable } from "svelte/store";
+	import { toast } from "svelte-sonner";
 
-	export let row: UserTableItem;
-	const task = userSchema.parse(row);
-</script>
+    export let id: number;
+ 
+    const newPassword = writable("");
+    const showResetModal = writable(false);
+    let showPasswordModal = false;
 
-<DropdownMenu.Root>
-	<DropdownMenu.Trigger asChild let:builder>
-		<Button
-			variant="ghost"
-			builders={[builder]}
-			class="data-[state=open]:bg-muted flex h-8 w-8 p-0"
-		>
-			<DotsHorizontal class="h-4 w-4" />
-			<span class="sr-only">Open Menu</span>
-		</Button>
-	</DropdownMenu.Trigger>
-	<DropdownMenu.Content class="w-[160px]" align="end">
-		<DropdownMenu.Item>Edit</DropdownMenu.Item>
-		<DropdownMenu.Item>Make a copy</DropdownMenu.Item>
-		<DropdownMenu.Item>Favorite</DropdownMenu.Item>
-		<DropdownMenu.Separator />
-		<DropdownMenu.Sub>
-			<DropdownMenu.SubTrigger>Labels</DropdownMenu.SubTrigger>
-			<DropdownMenu.SubContent>
-				<DropdownMenu.RadioGroup value={task.label}>
-					{#each labels as label}
-						<DropdownMenu.RadioItem value={label.value}>
-							{label.label}
-						</DropdownMenu.RadioItem>
-					{/each}
-				</DropdownMenu.RadioGroup>
-			</DropdownMenu.SubContent>
-		</DropdownMenu.Sub>
-		<DropdownMenu.Separator />
-		<DropdownMenu.Item>
-			Delete
-			<DropdownMenu.Shortcut>⌘⌫</DropdownMenu.Shortcut>
-		</DropdownMenu.Item>
-	</DropdownMenu.Content>
-</DropdownMenu.Root>
+    const handlePasswordReset = async (event: CustomEvent<{ newPassword: string }>) => {
+      const { newPassword } = event.detail;
+      await updateUserPassword(id, newPassword);
+      showPasswordModal = false;
+      const msg: string = 'Password updated successfully for user id ' + id.toString() + '.';
+      toast(msg);
+    };
+   </script>
+
+   <DropdownMenu.Root>
+    <DropdownMenu.Trigger asChild let:builder>
+     <Button
+      variant="ghost"
+      builders={[builder]}
+      size="icon"
+      class="relative h-8 w-8 p-0"
+     >
+      <span class="sr-only">Open menu</span>
+      <Ellipsis class="h-4 w-4" />
+     </Button>
+    </DropdownMenu.Trigger>
+    <DropdownMenu.Content>
+     <DropdownMenu.Group>
+      <DropdownMenu.Label>Actions</DropdownMenu.Label>
+      <DropdownMenu.Item on:click={() => (showPasswordModal = true)}>
+         Reset Password
+        </DropdownMenu.Item>
+        <DropdownMenu.Item on:click={() => deleteUserById(id)}>
+          Delete User
+         </DropdownMenu.Item>
+     </DropdownMenu.Group>
+     <DropdownMenu.Separator />
+        <DropdownMenu.Item on:click={() => navigator.clipboard.writeText(id.toString())} >
+        Enable/Disable
+        </DropdownMenu.Item>
+        <DropdownMenu.Item on:click={() => navigator.clipboard.writeText(id.toString())}>
+        Modify Roles
+        </DropdownMenu.Item>
+    </DropdownMenu.Content>
+   </DropdownMenu.Root>
+
+   <PasswordResetModal
+   show={showPasswordModal}
+   id={id}
+   on:reset={handlePasswordReset}
+   on:close={() => (showPasswordModal = false)}
+ />
+<Toaster />
+
+ 

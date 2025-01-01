@@ -2,7 +2,7 @@
     import { fetchUsers, type User } from "$lib/services/user";
     import { onMount } from "svelte";
     import { writable } from "svelte/store";  // Import writable store
-    import DataTable from "./data-table.svelte";
+    import DataTable from "$lib/components/ui/UsersTable/data-table.svelte";
 
     let usersStore = writable<User[]>([]);
 
