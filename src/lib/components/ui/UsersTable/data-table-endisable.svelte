@@ -4,6 +4,7 @@
     import * as Select from "$lib/components/ui/select/index.js";
     import { Input } from "$lib/components/ui/input/index.js";
     import { Label } from "$lib/components/ui/label/index.js";
+    import { enableUser, disableUser } from "$lib/services/user";
     import { goto } from '$app/navigation';
     import { updateUserPassword } from "$lib/services/user";
     import { createEventDispatcher } from 'svelte';
@@ -11,8 +12,10 @@
     export let show: boolean = false;
     export let id: number;
 
-    let execEnableUser = false;
-    let execDisableUser = false;
+    interface ExecAction {
+      EnableUser: boolean
+      DisableUser: boolean
+    }
     
     interface Choice {
       label: string,
@@ -20,23 +23,34 @@
     }
     let choices: Choice[] = [{label: "Enable", value: "enable"}, {label: "Disable", value: "disable"}]
     let userChoice:  Choice  = {label: "Enable", value: "enable"}
+    let execAction: ExecAction = { EnableUser: true, DisableUser: false}
 
     
-    const resetEnableDisableEvent = () => {
-    if (execEnableUser = true) {
-      dispatch('reset', { execEnableUser });
-    } else if (execDisableUser = true) { 
-      dispatch('reset', { execDisableUser });
-    }
+    const resetEnableDisableEvent = async () => {
+      if (execAction.EnableUser === true) {
+        const user = await enableUser(id);
+        const msg = user.data?.username + " has been enabled."
+        console.log("User enabled:", user);
+        show = false;
+        dispatch("reset", msg)
+      } else if (execAction.DisableUser === true) {
+          const user = await disableUser(id);
+          const msg = user.data?.username + " has been disabled."
+          console.log("User enabled:", user);
+          show = false;
+          dispatch("reset", msg)
+      }
   };
 
   const choiceValueSetter = (userChoiceVal: string) => {
     if (userChoiceVal === "enable") {
-      execEnableUser = true;
-      execDisableUser = false;
+      console.log("setting execAction to enable")
+      execAction.EnableUser = true;
+      execAction.DisableUser = false;
     } else if (userChoiceVal === "disable") { 
-      execDisableUser = true;
-      execEnableUser = false;
+      console.log("setting execAction to disable")
+      execAction.DisableUser = true;
+      execAction.EnableUser = false;
     }
   };
   

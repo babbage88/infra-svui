@@ -15,6 +15,8 @@
  
     const newPassword = writable("");
     const showResetModal = writable(false);
+    const enableDisableMsg = writable("");
+    const showEnableModal = writable(false);
     let showPasswordModal = false;
     let showEnableDisableModal = false;
 
@@ -26,24 +28,11 @@
       toast(msg);
     };
 
-    const handleEnableDisableUser = async (
-      event: CustomEvent<{ execEnableUser: boolean; execDisableUser: boolean }>
-    ) => {
-      const { execEnableUser, execDisableUser } = event.detail;
-
-      if (execEnableUser) {
-        const user = await enableUser(id);
-        console.log("User enabled:", user);
-        showEnableDisableModal = false;
-        const msg = user.data?.username + " has been enabled."
-        toast(msg)
-      } else if (execDisableUser) {
-        const user = await disableUser(id);
-        console.log("User disabled:", user);
-        showEnableDisableModal = false;
-        const msg = user.data?.username + " has been disabled."
-        toast(msg)
-      }
+    const handleEnableDisableUser = async (event: CustomEvent<{ enableDisableMsg: string }>) => {
+      const { enableDisableMsg } = event.detail;
+      console.log("toastmsg")
+      console.log(enableDisableMsg)
+      toast(enableDisableMsg);
     };
 
    </script>

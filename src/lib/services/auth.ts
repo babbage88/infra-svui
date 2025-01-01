@@ -20,7 +20,7 @@ export const login = async (username: string, password: string): Promise<string 
         // Store the token in localStorage or a cookie
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('refreshToken', data.refreshToken);
-        return ''; // No error message
+        return '';
       } else {
         const text = await response.text();
         return `Login failed: ${text}`;
@@ -47,10 +47,11 @@ const refreshAuthToken = async (): Promise<void> => {
 
       const data = await response.json();
       localStorage.setItem('authToken', data.authToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
   } catch (error) {
       console.error('Token refresh failed:', error);
       localStorage.clear();
-      window.location.href = '/login'; // Redirect to login on failure
+      window.location.href = '/login';
   }
 };
 
@@ -70,7 +71,7 @@ export const fetchWithAuth = async (url: string, options: RequestInit = {}): Pro
           ...options,
           headers: {
               ...options.headers,
-              Authorization: `Bearer ${localStorage.getItem('refreshToken')}`
+              Authorization: `Bearer ${localStorage.getItem('authToken')}`
           }
       });
   }
