@@ -16,10 +16,10 @@
     const newPassword = writable("");
     const showResetModal = writable(false);
     const enableDisableMsg = writable("");
-    const showEnableModal = writable(false);
-    
+    const showEnableDisableModal = writable(false);
+
     let showPasswordModal = false;
-    let showEnableDisableModal = false;
+   
 
     const handlePasswordReset = async (event: CustomEvent<{ newPassword: string }>) => {
       const { newPassword } = event.detail;
@@ -62,7 +62,7 @@
          </DropdownMenu.Item>
      </DropdownMenu.Group>
      <DropdownMenu.Separator />
-        <DropdownMenu.Item on:click={() => (showEnableDisableModal = true)} >
+        <DropdownMenu.Item on:click={() => showEnableDisableModal.set(true) } >
         Enable/Disable
         </DropdownMenu.Item>
         <DropdownMenu.Item on:click={() => navigator.clipboard.writeText(id.toString())}>
@@ -82,9 +82,9 @@
   show={showEnableDisableModal}
   id={id}
   on:reset={handleEnableDisableUser}
-  on:close={() => (showEnableDisableModal = false)}
-  
- />
+  on:close={() => showEnableDisableModal.set(false)} 
+/>
+
 <Toaster />
 
  

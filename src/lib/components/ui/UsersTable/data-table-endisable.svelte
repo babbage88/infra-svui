@@ -7,9 +7,12 @@
     import { enableUser, disableUser } from "$lib/services/user";
     import { goto } from '$app/navigation';
     import { updateUserPassword } from "$lib/services/user";
+
     import { createEventDispatcher } from 'svelte';
     const dispatch = createEventDispatcher();
-    export let show: boolean = false;
+    import type { Writable } from 'svelte/store'; // Import the Writable type
+
+    export let show: Writable<boolean>;
     export let id: number;
     let enableDisableMsg: string = '';
 
@@ -33,14 +36,14 @@
         const user = await enableUser(id);
         const msg = user.data?.username + " has been enabled."
         console.log("User enabled:", user);
-        show = false;
+        show.set(false);
         console.log('reset', enableDisableMsg)
         dispatch("reset", { enableDisableMsg: msg }); 
       } else if (execAction.DisableUser === true) {
           const user = await disableUser(id);
           const msg = user.data?.username + " has been disabled."
           console.log("User enabled:", user);
-          show = false;
+          show.set(false);
           console.log('reset', enableDisableMsg)
           dispatch("reset", { enableDisableMsg: msg }); 
       }
@@ -60,11 +63,13 @@
   
 
   const closeModal = () => {
-    dispatch('close');
-  };
+  show.set(false); // Ensure the writable store is updated
+  dispatch('close');
+};
+
    </script>
     
-  {#if show}
+  {#if $show}
   <div class="fixed inset-0 flex items-center justify-center">
    <Card.Root class="w-[350px]">
     <Card.Header>
