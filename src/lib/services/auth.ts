@@ -46,8 +46,7 @@ const refreshAuthToken = async (): Promise<void> => {
       }
 
       const data = await response.json();
-      localStorage.setItem('authToken', data.authToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
+      localStorage.setItem('authToken', data.token);
   } catch (error) {
       console.error('Token refresh failed:', error);
       localStorage.clear();
@@ -67,6 +66,15 @@ export const fetchWithAuth = async (url: string, options: RequestInit = {}): Pro
   if (response.status === 401) {
       // Token expired; attempt to refresh
       await refreshAuthToken();
+      response = await fetch(url, {
+          ...options,
+          headers: {
+              ...options.headers,
+              Authorization: `Bearer ${localStorage.getItem('authToken')}`
+          }
+      });
+  } else if (response.status === 500) {
+    await refreshAuthToken();
       response = await fetch(url, {
           ...options,
           headers: {

@@ -11,6 +11,7 @@
     const dispatch = createEventDispatcher();
     export let show: boolean = false;
     export let id: number;
+    let enableDisableMsg: string = '';
 
     interface ExecAction {
       EnableUser: boolean
@@ -29,16 +30,16 @@
     const resetEnableDisableEvent = async () => {
       if (execAction.EnableUser === true) {
         const user = await enableUser(id);
-        const msg = user.data?.username + " has been enabled."
+        const enableDisableMsg = user.data?.username + " has been enabled."
         console.log("User enabled:", user);
         show = false;
-        dispatch("reset", msg)
+        dispatch("reset", enableDisableMsg)
       } else if (execAction.DisableUser === true) {
           const user = await disableUser(id);
-          const msg = user.data?.username + " has been disabled."
+          const enableDisableMsg = user.data?.username + " has been disabled."
           console.log("User enabled:", user);
           show = false;
-          dispatch("reset", msg)
+          dispatch("reset", enableDisableMsg)
       }
   };
 
